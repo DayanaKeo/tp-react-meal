@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect } from "react";
 import { View, Text, FlatList, TouchableOpacity, StyleSheet, Image } from "react-native";
 import { useRouter } from "expo-router";
 import { useFocusEffect } from "@react-navigation/native";
@@ -10,12 +10,13 @@ import { useUser } from "@clerk/clerk-expo";
 export default function MealsList() {
   const [meals, setMeals] = React.useState<Meal[]>([]);
   const router = useRouter();
-  const { user } = useUser();
+  const { user, isLoaded } = useUser();
   
   useFocusEffect(
     React.useCallback(() => {
-      if (user) getMeals(user.id).then(setMeals);
-    }, [user])
+      if (!isLoaded || !user) return;
+      getMeals(user.id).then(setMeals);
+    }, [isLoaded, user])
   );
 
   const renderItem = ({ item }: { item: Meal }) => (
